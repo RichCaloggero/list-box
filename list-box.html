@@ -1,0 +1,77 @@
+<doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Test</title>
+</head>
+<body>
+<h1>Test (1)</h1>
+<ul class="listbox"><li>
+text item
+</li><li>
+<label><input type="checkbox"> checkbox item</label>
+</li><li>
+<button>button item</button>
+</li><li>
+<a href="#">link item</a>
+</li></ul>
+
+<script>
+document.querySelectorAll("ul.listbox").forEach(listbox => {
+const focusableElementSelector = "input, a, button, [tabindex='0']";
+
+addKeyboardNavigation(listbox);
+setInitialFocus(listbox);
+
+function addKeyboardNavigation (l) {
+listbox.addEventListener("keydown", navigate);
+} // addKeyboardNavigation
+
+function setInitialFocus (l) {
+addAria(listbox);
+makeAllUnfocusable(l);
+setFocus(l.firstElementChild);
+} // setInitialFocus
+
+function makeAllUnfocusable (l) {
+Array.from(l.querySelectorAll(`li, ${focusableElementSelector}`)).forEach(element => element.setAttribute("tabindex", "-1"));
+} // makeAllUnfocusable
+
+function setFocus (element) {
+makeAllUnfocusable(listbox);
+element = element.querySelector(focusableElementSelector);
+if (element) {
+element.setAttribute("tabindex", "0");
+element.focus();
+} // if
+} // setFocus
+
+function navigate (e) {
+if (e.key === "ArrowDown") setFocus(next(getFocus()));
+else if (e.key === "ArrowUp") setFocus(previous(getFocus()));
+else return;
+
+e.preventDefault();
+
+function next (element) {
+const x = element.closest("li").nextElementSibling;
+return x? x : element;
+} // next
+
+
+function previous (element) {
+const x = element.closest("li").previousElementSibling;
+return x? x : element;
+} // previous
+} // navigate
+
+function addAria (l) {
+l.setAttribute("role", "listbox");
+Array.from(l.querySelectorAll("li")).forEach(x => x.setAttribute("role", "listitem"));
+} // addAria
+});
+
+</script>
+
+</body>
+</html>
